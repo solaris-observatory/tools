@@ -37,8 +37,16 @@ for start_time in start_times:
     num_points = 31  # sample every 0.5s
     times = start_time + np.linspace(0, duration.value, num_points) * u.s
 
-    # Get true solar positions in Az/El
-    altaz_frame = AltAz(obstime=times, location=location)
+    # Get true solar positions in Az/El, accounting for atmospheric
+    # refraction (based on pressure, temperature, humidity, wavelength).
+    altaz_frame = AltAz(
+        obstime=times,
+        location=location,
+        pressure=650 * u.hPa,
+        temperature=-30 * u.deg_C,
+        relative_humidity=0.2,
+        obswl=3 * u.mm  # wavelength for 100 GHz
+    )
     sun_altaz = get_sun(times).transform_to(altaz_frame)
 
     # Initial and final points
